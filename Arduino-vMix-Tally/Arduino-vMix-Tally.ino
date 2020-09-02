@@ -7,8 +7,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <WiFiClient.h>
-#include <Adafruit_GFX.h>
-#include <WEMOS_Matrix_GFX.h>
 #include "FS.h"
 
 // Constants
@@ -47,7 +45,11 @@ char apPass[64];
 int port = 8099;
 
 // LED settings
-MLED matrix(4);
+#include <Adafruit_NeoPixel.h>
+#define LED_PIN D2
+int NUM_LEDS = 7;
+int PIXEL_FORMAT = NEO_GRB + NEO_KHZ800;
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUM_LEDS, LED_PIN, PIXEL_FORMAT);
 
 // Tally info
 char currentState = -1;
@@ -55,11 +57,25 @@ const char tallyStateOff = 0;
 const char tallyStateProgram = 1;
 const char tallyStatePreview = 2;
 
+// LED colors
+static const uint32_t red = pixels.Color(255,0,0);
+static const uint32_t green = pixels.Color(0,255,0);
+static const uint32_t blue = pixels.Color(0,0,255);
+static const uint32_t yellow = pixels.Color(255,255,0);
+static const uint32_t white = pixels.Color(255,255,255);
+static const uint32_t pink = pixels.Color(255,0,100);
+static const uint32_t purple = pixels.Color(255,0,255);
+static const uint32_t cyan = pixels.Color(0,255,255);
+static const uint32_t orange = pixels.Color(230,80,0);
+static const uint32_t black = pixels.Color(0,0,0);
+
 // LED characters
-static const uint8_t PROGMEM C[] = {B00000000, B01111110, B11111111, B10000001, B10000001, B11000011, B01000010, B00000000};
-static const uint8_t PROGMEM L[] = {B00000000, B11111111, B11111111, B11000000, B11000000, B11000000, B11000000, B00000000};
-static const uint8_t PROGMEM P[] = {B00000000, B11111111, B11111111, B00010001, B00010001, B00011111, B00001110, B00000000};
-static const uint8_t PROGMEM S[] = {B00000000, B01001100, B11011110, B10010010, B10010010, B11110110, B01100100, B00000000};
+static uint32_t C[] = {purple, black, black, black, black, black, black};   // connecting
+static uint32_t L[] = {red, red, red, red, red, red, red};                  // live
+static uint32_t P[] = {green, green, green, green, green, green, green};    // preview
+static uint32_t S[] = {orange, black, black, black, black, black, black};   // settings
+static uint32_t O[] = {black, black, black, black, black, black, black};    // off
+
 
 // The WiFi client
 WiFiClient client;
@@ -169,59 +185,55 @@ void printSettings()
 }
 
 // Set led intensity from 0 to 7
-void ledSetIntensity(int intensity)
+//void ledSetIntensity(int intensity)
+//{
+//
+//}
+
+// Set LED's
+void setLeds(uint32_t colors[])
 {
-  matrix.intensity = intensity;
+  for(int i=0;i<sizeof(colors);i++)
+  {
+    pixels.setPixelColor(i, colors[i]);
+  }
+  pixels.show();  
 }
 
 // Set LED's off
 void ledSetOff()
 {
-  matrix.clear();
-  matrix.writeDisplay();
+  setLeds(O);
 }
 
 // Draw L(ive) with LED's
 void ledSetProgram()
 {
-  matrix.clear();
-  matrix.drawBitmap(0, 0, L, 8, 8, LED_ON);
-  ledSetIntensity(7);
-  matrix.writeDisplay();
+  setLeds(L);
 }
 
 // Draw P(review) with LED's
 void ledSetPreview()
 {
-  matrix.clear();
-  matrix.drawBitmap(0, 0, P, 8, 8, LED_ON);
-  ledSetIntensity(2);
-  matrix.writeDisplay();
+  setLeds(P);
 }
 
 // Draw C(onnecting) with LED's
 void ledSetConnecting()
 {
-  matrix.clear();
-  matrix.drawBitmap(0, 0, C, 8, 8, LED_ON);
-  ledSetIntensity(7);
-  matrix.writeDisplay();
+  setLeds(C);
 }
 
 // Draw S(ettings) with LED's
 void ledSetSettings()
 {
-  matrix.clear();
-  matrix.drawBitmap(0, 0, S, 8, 8, LED_ON);
-  ledSetIntensity(7);
-  matrix.writeDisplay();
+  setLeds(S);
 }
 
 // Set tally to off
 void tallySetOff()
 {
   Serial.println("Tally off");
-
   ledSetOff();
 }
 
@@ -565,12 +577,15 @@ void setup()
   Serial.begin(9600);
   EEPROM.begin(512);
   SPIFFS.begin();
-
+  
+  pixels.begin();
+  //setLeds(O);
+  
   httpServer.on("/", HTTP_GET, rootPageHandler);
   httpServer.on("/save", HTTP_POST, handleSave);
   httpServer.serveStatic("/", SPIFFS, "/", "max-age=315360000");
   httpServer.begin();
-
+ 
   start();
 }
 
