@@ -191,9 +191,9 @@ void printSettings()
 //}
 
 // Set LED's
-void setLeds(uint32_t colors[])
+void setLeds(uint32_t colors[], size_t size)
 {
-  for(int i=0;i<sizeof(colors);i++)
+  for(int i=0;i<size;i++)
   {
     pixels.setPixelColor(i, colors[i]);
   }
@@ -203,31 +203,31 @@ void setLeds(uint32_t colors[])
 // Set LED's off
 void ledSetOff()
 {
-  setLeds(O);
+  setLeds(O, sizeof(O));
 }
 
 // Draw L(ive) with LED's
 void ledSetProgram()
 {
-  setLeds(L);
+  setLeds(L, sizeof(L));
 }
 
 // Draw P(review) with LED's
 void ledSetPreview()
 {
-  setLeds(P);
+  setLeds(P, sizeof(P));
 }
 
 // Draw C(onnecting) with LED's
 void ledSetConnecting()
 {
-  setLeds(C);
+  setLeds(C, sizeof(C));
 }
 
 // Draw S(ettings) with LED's
 void ledSetSettings()
 {
-  setLeds(S);
+  setLeds(S, sizeof(S));
 }
 
 // Set tally to off
