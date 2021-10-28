@@ -46,8 +46,8 @@ int port = 8099;
 
 // LED settings
 #include <Adafruit_NeoPixel.h>
-#define LED_PIN D2
-int NUM_LEDS = 7;
+#define LED_PIN D1
+int NUM_LEDS = 11;
 int PIXEL_FORMAT = NEO_GRB + NEO_KHZ800;
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUM_LEDS, LED_PIN, PIXEL_FORMAT);
 
