@@ -193,11 +193,11 @@ void printSettings()
 // Set LED's
 void setLeds(uint32_t colors[], size_t size)
 {
-  for(int i=0;i<size;i++)
+  for(int i=0;i<size/sizeof(uint32_t);i++)
   {
     pixels.setPixelColor(i, colors[i]);
   }
-  pixels.show();  
+  pixels.show();
 }
 
 // Set LED's off
