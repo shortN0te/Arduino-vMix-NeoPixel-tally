@@ -5,9 +5,9 @@
 
 #include <EEPROM.h>
 #include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
 #include <WiFiClient.h>
 #include "FS.h"
+#include <ESPAsyncWebServer.h>
 
 // Constants
 const int SsidMaxLength = 64;
@@ -35,7 +35,7 @@ Settings defaultSettings = {
 Settings settings;
 
 // HTTP Server settings
-ESP8266WebServer httpServer(80);
+AsyncWebServer server(80);
 char deviceName[32];
 int status = WL_IDLE_STATUS;
 bool apEnabled = false;
@@ -320,7 +320,7 @@ void apStart()
 }
 
 // Hanle http server root request
-void rootPageHandler()
+String rootPageHandler()
 {
   String response_message = "<!DOCTYPE html>";
   response_message += "<html lang='en'>";
@@ -406,58 +406,44 @@ void rootPageHandler()
   response_message += "</body>";
   response_message += "</html>";
 
-  httpServer.sendHeader("Connection", "close");
-  httpServer.send(200, "text/html", String(response_message));
+  return response_message;
 }
 
 // Settings POST handler
-void handleSave()
+void handleSave(AsyncWebServerRequest* request)
 {
-  bool doRestart = false;
-
-  httpServer.sendHeader("Location", String("/"), true);
-  httpServer.send(302, "text/plain", "Redirected to: /");
-
-  if (httpServer.hasArg("ssid"))
+  if (request->hasArg("ssid"))
   {
-    if (httpServer.arg("ssid").length() <= SsidMaxLength)
+    if (request->arg("ssid").length() <= SsidMaxLength)
     {
-      httpServer.arg("ssid").toCharArray(settings.ssid, SsidMaxLength);
-      doRestart = true;
+      request->arg("ssid").toCharArray(settings.ssid, SsidMaxLength);
     }
   }
 
-  if (httpServer.hasArg("ssidpass"))
+  if (request->hasArg("ssidpass"))
   {
-    if (httpServer.arg("ssidpass").length() <= PassMaxLength)
+    if (request->arg("ssidpass").length() <= PassMaxLength)
     {
-      httpServer.arg("ssidpass").toCharArray(settings.pass, PassMaxLength);
-      doRestart = true;
+      request->arg("ssidpass").toCharArray(settings.pass, PassMaxLength);
     }
   }
 
-  if (httpServer.hasArg("hostname"))
+  if (request->hasArg("hostname"))
   {
-    if (httpServer.arg("hostname").length() <= HostNameMaxLength)
+    if (request->arg("hostname").length() <= HostNameMaxLength)
     {
-      httpServer.arg("hostname").toCharArray(settings.hostName, HostNameMaxLength);
-      doRestart = true;
+      request->arg("hostname").toCharArray(settings.hostName, HostNameMaxLength);
     }
   }
 
-  if (httpServer.hasArg("inputnumber"))
+  if (request->hasArg("inputnumber"))
   {
-    if (httpServer.arg("inputnumber").toInt() > 0 and httpServer.arg("inputnumber").toInt() <= TallyNumberMaxValue)
+    if (request->arg("inputnumber").toInt() > 0 and request->arg("inputnumber").toInt() <= TallyNumberMaxValue)
     {
-      settings.tallyNumber = httpServer.arg("inputnumber").toInt();
-      doRestart = true;
+      settings.tallyNumber = request->arg("inputnumber").toInt();
     }
   }
-
-  if (doRestart == true)
-  {
-    restart();
-  }
+  request->redirect("/");
 }
 
 // Connect to WiFi
@@ -581,18 +567,24 @@ void setup()
   pixels.begin();
   //setLeds(O);
   
-  httpServer.on("/", HTTP_GET, rootPageHandler);
-  httpServer.on("/save", HTTP_POST, handleSave);
-  httpServer.serveStatic("/", SPIFFS, "/", "max-age=315360000");
-  httpServer.begin();
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/html", rootPageHandler());
+  });
+  server.on("/save", HTTP_POST, [](AsyncWebServerRequest *request) {
+    for(int i=0;i<request->params();i++)
+    {
+      Serial.println(request->getParam(i)->value().c_str());
+    }
+    handleSave(request);
+  });
+
+  server.begin();
  
   start();
 }
 
 void loop()
 {
-  httpServer.handleClient();
-
   while (client.available())
   {
     String data = client.readStringUntil('\r\n');
