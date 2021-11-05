@@ -8,6 +8,8 @@
 #include <WiFiClient.h>
 #include "FS.h"
 #include <ESPAsyncWebServer.h>
+#include <AsyncElegantOTA.h>
+#include <ESPAsyncTCP.h>
 
 // Constants
 const int SsidMaxLength = 64;
@@ -570,6 +572,7 @@ void setup()
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/html", rootPageHandler());
   });
+  AsyncElegantOTA.begin(&server);    // Start ElegantOTA
   server.on("/save", HTTP_POST, [](AsyncWebServerRequest *request) {
     for(int i=0;i<request->params();i++)
     {
