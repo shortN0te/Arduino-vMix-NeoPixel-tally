@@ -1,76 +1,36 @@
 # Arduino vMix tally
 
 This project contains the firmware for a tally system based on an Arduino esp8266 and the vMix TCP API. 
-It is a fork of the work of Thomas Mout and has been adapted to use NeoPixels instead of a led display.
-
-## Pictures
-
-<img src="/Pictures/Tally_Preview.jpg" alt="Preview" width="640">
-
-<img src="/Pictures/Tally_Off.jpg" alt="off" width="640">
-
-<img src="/Pictures/Tally_Animation.gif" alt="In Action" width="640">
+It is a fork of the work of gjnijenhuis which is a fork of Thomas Mout and has been adapted to fit our needs.
 
 ### Hardware
 
+WIP
+
 #### Standard Parts
 
-For this project two pieces of hardware are needed:
-* [WeMos® D1 Mini] (https://www.amazon.de/gp/product/B0754W6Z2F)
-* NeoPixels, one of the folliwing:
-  * [Single NeoPixel] https://www.amazon.de/gp/product/B01N97A0XG/
-  * [7-dot Jewel NeoPixel] https://www.amazon.de/gp/product/B07234W6RQ/
+WIP
 
-#### 3D printed housing  
+#### Machined/3D printed housing  
 
-Additionally you need a 3D printed case and 3D printed lens. The design can be found in the Case folder of this repository.
-* [Case] Required
-* [Lens] Required
-* [Spacer] Only required if you use a single NeoPixel
-
-Recommended filament: ABS
-Recommended filament color: [Case] Black; [Lens] Transarent
-Recommended print settings: 0.2mm Layer Height; 0.4mm Line width; [Case] 4.5 Loops; 50% infill; 6 top/bottom layers; [Lens] 3.5 Loops; 10% infill; 4 top/bottom layers;
-
-Use a as low as possible infill and top/bottom layers for the lens to improve brightness of the led. 
+WIP
 
 #### Solder instructions
 
-To Do...
+WIP
 
 #### Assembly instructions
 
-The WeMos® D1 Mini slides into the slots of the housing.
-Position the led on the supports of the housing. Optionally screw down the led or spacer with M2 plastic screws.
-Finally screw the lens in the housing.
-
-Refer to the below cross sections of the assembly:
-
-[Single NeoPixel]
-<img src="/Pictures/Installation-Cross Section-Single-Pixel.png" alt="Single Pixel" >
-
-[7-dot Jewel NeoPixel]
-<img src="/Pictures/Installation-Cross Section-Jewel.png" alt="7-dot Jewel Pixel" >
+WIP
 
 ### Software
 
-#### 1. Install Arduino IDE
+#### Build instructions
 
-Download the Arduino IDE from the [Arduino website](https://www.arduino.cc/en/main/software) and install it.  
-After the installation is complete go to File > Preferences and add http://arduino.esp8266.com/stable/package_esp8266com_index.json to the additional Board Manager URL. Go to Tools > Board > Board Manager, search for *esp8266* and install the latest version. After the installation go to Tools > Board and select *Wemos D1 R2 and mini* as your default board.  
-
-#### 2. Install libraries
-
-Install the required libraries
-
-#### 3. Uploading static files
-
-Connect the Arduino to the computer with a USB cable.  
-The static files in the Arduino-vMix-Tally/data folder must be uploaded using the Tools > ESP8266 Sketch Data Upload in the Arduino IDE.  
-
-#### 4. Uploading firmware
-
-Upload the Arduino-vMix-Tally/Arduino-vMix-Tally.ino from this repository to the Arduino by pressing the Upload button. After the upload the tally will restart in Connecting mode (see the Muliple states section).  
+1. Install PlatformIO Core: [**Instructions**](https://docs.platformio.org/en/latest/core/installation.html)
+2. Download the repository: `git clone https://github.com/shortN0te/Arduino-vMix-NeoPixel-tally.git`
+3. change directory to: `Arduino-vMix-NeoPixel-tally/Arduino-vMix-Tally`
+4. run `pio run` inside the repository
 
 ## Getting Started
 
